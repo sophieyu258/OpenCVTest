@@ -12,7 +12,7 @@ const char* keys =
 	"{@video | | Video file, if not defined try to use webcamera}"
 };
 
-int main(int argc, const char** argv)
+int test2_main(int argc, const char** argv)
 {
 	//CommandLineParser parser(argc, argv, keys);
 	//parser.about("Chapter 2. v1.0.0");

@@ -7,10 +7,11 @@
 
 using namespace std;
 
-string sImageIn1 = "H:\\work2\\OpenCV\\opencv\\samples\\data\\lena.jpg";
+string sDataPath = "H:\\work2\\OpenCV\\opencv\\samples\\data\\";
+string sImageIn1 = sDataPath + "lena.jpg";
 string sImageOut1 = "lenaGray.jpg";
 
-string sVideoInAVI = "H:\\work2\\OpenCV\\Builds\\bin\\data\\vtest.avi";
+string sVideoInAVI = sDataPath + "vtest.avi";
 string sVideoInMP4 = 
 	"\\\\corp\\data\\content\\QA - Functional Database Files\\Multimedia\\Albert Einstein - 3 hours.mp4";
 

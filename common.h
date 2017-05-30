@@ -7,6 +7,7 @@
 
 using namespace std;
 
+extern string sDataPath;
 extern string sImageIn1;
 extern string sImageOut1;
 
