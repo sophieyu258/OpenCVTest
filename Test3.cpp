@@ -1,44 +1,91 @@
 #include "common.h"
 
+# include <windows.h>
+
+# pragma comment(lib, "opengl32.lib")
+# pragma comment(lib, "glu32.lib")
+
+// OpenGL includes
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#else
+#include <GL/gl.h>
+#endif
+
 // OpenCV includes
 #include "opencv2/core.hpp"
+#include "opencv2/imgproc.hpp"
 #include "opencv2/highgui.hpp"
 using namespace cv;
 
+Mat frame;
+GLfloat angle = 0.0;
+GLuint texture;
+VideoCapture camera;
+
+int loadTexture() {
+
+	if (frame.data == NULL) return -1;
+
+	glBindTexture(GL_TEXTURE_2D, texture); //bind the texture to it's array
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, frame.cols, frame.rows, 0, GL_RGB, GL_UNSIGNED_BYTE, frame.data);
+	return 0;
+
+}
+
+void on_opengl(void* param)
+{
+	glLoadIdentity();
+	// Load Texture
+	glBindTexture(GL_TEXTURE_2D, texture);
+	// Rotate plane
+	glRotatef(angle, 1.0f, 1.0f, 1.0f);
+	// Create the plate
+	glBegin(GL_QUADS);
+	glTexCoord2d(0.0, 0.0); glVertex2d(-1.0, -1.0);
+	glTexCoord2d(1.0, 0.0); glVertex2d(+1.0, -1.0);
+	glTexCoord2d(1.0, 1.0); glVertex2d(+1.0, +1.0);
+	glTexCoord2d(0.0, 1.0); glVertex2d(-1.0, +1.0);
+	glEnd();
+
+}
+
 int main(int argc, const char** argv)
 {
-	// Read images
-	Mat lena = imread(sImageIn1);
-	Mat photo = imread((sDataPath + "pic2.png").c_str());
-	// Create windows
-	namedWindow("Lena", CV_WINDOW_NORMAL);
-	namedWindow("Photo", WINDOW_AUTOSIZE);
-	// Move window
-	moveWindow("Lena", 10, 10);
-	moveWindow("Photo", 520, 10);
-	// show images
-	imshow("Lena", lena);
-	imshow("Photo", photo);
+	String videoFile = sVideoInMP4;
+	VideoCapture cap; // open the default camera
+	if (videoFile != "")
+		camera.open(videoFile);
+	else
+		camera.open(0);
+	if (!camera.isOpened())
+		return -1;
 
-	// Resize window, only non autosize
-	resizeWindow("Lena", 512, 512);
-	// wait for any key press
-	waitKey(0);
+	// Create new windows
+	namedWindow("OpenGL Camera", WINDOW_OPENGL);
+
+	// Enable texture
+	glEnable(GL_TEXTURE_2D);
+	glGenTextures(1, &texture);
+
+	setOpenGlDrawCallback("OpenGL Camera", on_opengl);
+
+	while (waitKey(30) != 'q') {
+		camera >> frame;
+		// Create first texture
+		loadTexture();
+		updateWindow("OpenGL Camera");
+		angle = angle + 1;
+	}
+
 
 	// Destroy the windows
-	destroyWindow("Lena");
-	destroyWindow("Photo");
-	// Create 10 windows
-	for (int i = 0; i< 10; i++)
-	{
-		ostringstream ss;
-		ss << "Photo " << i;
-		namedWindow(ss.str());
-		moveWindow(ss.str(), 20 * i, 20 * i);
-		imshow(ss.str(), photo);
-	}
-	waitKey(0);
-	// Destroy all windows
-	destroyAllWindows();
+	destroyWindow("OpenGL Camera");
+
 	return 0;
 }
