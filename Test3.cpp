@@ -11,7 +11,7 @@ int main(int argc, const char** argv)
 	Mat lena = imread(sImageIn1);
 	Mat photo = imread((sDataPath + "pic2.png").c_str());
 	// Create windows
-	namedWindow("Lena", CV_GUI_NORMAL);
+	namedWindow("Lena", CV_WINDOW_NORMAL);
 	namedWindow("Photo", WINDOW_AUTOSIZE);
 	// Move window
 	moveWindow("Lena", 10, 10);
